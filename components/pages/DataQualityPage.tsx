@@ -2,8 +2,8 @@
 
 import { AppShell } from "@/components/layout/AppShell";
 import { RealtimeTable } from "@/components/tables/RealtimeTable";
-import { useCollection } from "@/lib/useFirestore";
 import { qIssues } from "@/lib/queries";
+import { useCollectionSource } from "@/lib/useDataSource";
 import type { DataQualityIssue } from "@/lib/types";
 
 const columns = [
@@ -20,7 +20,7 @@ const columns = [
 ];
 
 export function DataQualityPage() {
-  const { data } = useCollection<DataQualityIssue>(qIssues());
+  const { data } = useCollectionSource<DataQualityIssue>("data_quality_issues", qIssues());
   return (
     <AppShell>
       <div className="mb-6">

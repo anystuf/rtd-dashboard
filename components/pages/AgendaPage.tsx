@@ -2,8 +2,8 @@
 
 import { AppShell } from "@/components/layout/AppShell";
 import { RealtimeTable } from "@/components/tables/RealtimeTable";
-import { useCollection } from "@/lib/useFirestore";
 import { qAgenda } from "@/lib/queries";
+import { useCollectionSource } from "@/lib/useDataSource";
 import { sortByFields } from "@/lib/utils";
 
 const columns = [
@@ -18,7 +18,7 @@ const columns = [
 ];
 
 export function AgendaPage() {
-  const { data } = useCollection<Record<string, unknown>>(qAgenda());
+  const { data } = useCollectionSource<Record<string, unknown>>("agenda_items", qAgenda());
   const rows = sortByFields(data, ["date", "startTime", "title"]);
   return (
     <AppShell>

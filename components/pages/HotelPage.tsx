@@ -2,8 +2,8 @@
 
 import { AppShell } from "@/components/layout/AppShell";
 import { RealtimeTable } from "@/components/tables/RealtimeTable";
-import { useCollection } from "@/lib/useFirestore";
 import { qHotel } from "@/lib/queries";
+import { useCollectionSource } from "@/lib/useDataSource";
 
 const columns = [
   { key: "fullName", label: "Guest" },
@@ -16,7 +16,7 @@ const columns = [
 ];
 
 export function HotelPage() {
-  const { data } = useCollection<Record<string, unknown>>(qHotel());
+  const { data } = useCollectionSource<Record<string, unknown>>("hotel_bookings", qHotel());
   return (
     <AppShell>
       <div className="mb-6">

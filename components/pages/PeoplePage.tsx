@@ -2,8 +2,8 @@
 
 import { AppShell } from "@/components/layout/AppShell";
 import { RealtimeTable } from "@/components/tables/RealtimeTable";
-import { useCollection } from "@/lib/useFirestore";
 import { qPeople, qUEH, qVIP } from "@/lib/queries";
+import { useCollectionSource } from "@/lib/useDataSource";
 import { sortByText } from "@/lib/utils";
 import type { Person } from "@/lib/types";
 
@@ -20,8 +20,9 @@ const columns = [
 
 export function PeoplePage({ mode }: { mode: "all" | "vip" | "ueh" }) {
   const q = mode === "vip" ? qVIP() : mode === "ueh" ? qUEH() : qPeople();
-  const { data, loading, error } = useCollection<Person>(q);
-  const rows = sortByText(data, "fullName");
+  const { data, loading, error } = useCollectionSource<Person>("people", q);
+  const filtered = mode === "vip" ? data.filter((p) => p.isVIP) : mode === "ueh" ? data.filter((p) => p.isUEH) : data;
+  const rows = sortByText(filtered, "fullName");
   const title = mode === "vip" ? "VIP Data" : mode === "ueh" ? "UEH Data" : "Participants";
   const desc = mode === "vip" ? "Sanitized VIP participant list." : mode === "ueh" ? "UEH-related people extracted from all sources." : "All normalized people.";
 

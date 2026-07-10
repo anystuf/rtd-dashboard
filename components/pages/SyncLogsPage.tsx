@@ -2,8 +2,8 @@
 
 import { AppShell } from "@/components/layout/AppShell";
 import { RealtimeTable } from "@/components/tables/RealtimeTable";
-import { useCollection } from "@/lib/useFirestore";
 import { qSyncLogs } from "@/lib/queries";
+import { useCollectionSource } from "@/lib/useDataSource";
 import { formatDateTime } from "@/lib/utils";
 
 const columns = [
@@ -19,7 +19,7 @@ const columns = [
 ];
 
 export function SyncLogsPage() {
-  const { data } = useCollection<Record<string, unknown>>(qSyncLogs());
+  const { data } = useCollectionSource<Record<string, unknown>>("sync_logs", qSyncLogs());
   return (
     <AppShell>
       <div className="mb-6">

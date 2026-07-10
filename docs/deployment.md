@@ -30,6 +30,18 @@ The workflow at `.github/workflows/pages.yml` builds the static site whenever `m
 
 Before the first deployment, open the GitHub repo settings and set Pages source to **GitHub Actions**.
 
+### Optional no-Firebase data mode
+
+1. Deploy the Apps Script API in `docs/apps-script-data-api.md`.
+2. Add a GitHub repository variable named `NEXT_PUBLIC_DATA_API_URL` with the web app URL.
+3. Rerun the GitHub Pages workflow.
+
+For a quick one-browser test, open:
+
+```text
+https://anystuf.github.io/rtd-dashboard/?dataApiUrl=YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL
+```
+
 For Google sign-in on GitHub Pages, open Firebase Console:
 
 1. Go to **Authentication**.

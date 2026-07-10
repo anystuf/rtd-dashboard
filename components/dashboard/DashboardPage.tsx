@@ -3,8 +3,8 @@
 import { AppShell } from "@/components/layout/AppShell";
 import { MetricCard } from "@/components/dashboard/MetricCard";
 import { BarDistribution, PieDistribution } from "@/components/dashboard/SimpleCharts";
-import { useCollection, useDoc } from "@/lib/useFirestore";
 import { qDashboardMetrics, qIssues, qPeople } from "@/lib/queries";
+import { useCollectionSource, useDashboardMetricsSource } from "@/lib/useDataSource";
 import type { DashboardMetrics, DataQualityIssue, Person } from "@/lib/types";
 import { formatDateTime } from "@/lib/utils";
 
@@ -18,9 +18,9 @@ function countBy<T>(rows: T[], getter: (row: T) => string | undefined) {
 }
 
 export function DashboardPage() {
-  const metrics = useDoc<DashboardMetrics>(qDashboardMetrics());
-  const people = useCollection<Person>(qPeople());
-  const issues = useCollection<DataQualityIssue>(qIssues());
+  const metrics = useDashboardMetricsSource(qDashboardMetrics());
+  const people = useCollectionSource<Person>("people", qPeople());
+  const issues = useCollectionSource<DataQualityIssue>("data_quality_issues", qIssues());
   const m = metrics.data;
 
   return (

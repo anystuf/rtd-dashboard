@@ -105,6 +105,18 @@ npm run functions:deploy
 The frontend deploys to GitHub Pages through `.github/workflows/pages.yml` on pushes to `main`.
 Firebase remains responsible for Auth, Firestore, and Functions.
 
+## Fast no-Firebase data mode
+
+The GitHub Pages site can read live data directly from a Google Apps Script web app. This avoids Firebase Cloud Functions, Firestore indexes, and the Blaze upgrade while still auto-refreshing the dashboard every 60 seconds.
+
+Setup guide: `docs/apps-script-data-api.md`
+
+Quick test URL:
+
+```text
+https://anystuf.github.io/rtd-dashboard/?dataApiUrl=YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL
+```
+
 ## First manual sync
 
 Call the function URL:

@@ -2,8 +2,8 @@
 
 import { AppShell } from "@/components/layout/AppShell";
 import { RealtimeTable } from "@/components/tables/RealtimeTable";
-import { useCollection } from "@/lib/useFirestore";
 import { qFlights, qPickup } from "@/lib/queries";
+import { useCollectionSource } from "@/lib/useDataSource";
 
 const flightColumns = [
   { key: "fullName", label: "Guest" },
@@ -27,8 +27,8 @@ const pickupColumns = [
 ];
 
 export function FlightsPickupPage() {
-  const flights = useCollection<Record<string, unknown>>(qFlights());
-  const pickups = useCollection<Record<string, unknown>>(qPickup());
+  const flights = useCollectionSource<Record<string, unknown>>("flight_segments", qFlights());
+  const pickups = useCollectionSource<Record<string, unknown>>("pickup_tasks", qPickup());
   return (
     <AppShell>
       <div className="mb-6">
