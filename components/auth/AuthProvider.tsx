@@ -7,6 +7,8 @@ import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { auth, db, googleProvider } from "@/lib/firebaseClient";
 import type { UserRole } from "@/lib/types";
 
+const DASHBOARD_ADMIN_EMAILS = new Set(["trantrongnguyenhg@gmail.com"]);
+
 interface AuthContextValue {
   user: User | null;
   role: UserRole | null;
@@ -31,6 +33,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setRole(null);
       setLoading(false);
       if (firebaseUser) {
+        if (firebaseUser.email && DASHBOARD_ADMIN_EMAILS.has(firebaseUser.email.toLowerCase())) {
+          setRole("admin");
+          return;
+        }
         const token = await firebaseUser.getIdTokenResult(true);
         const claimRole = token.claims.role as UserRole | undefined;
         if (claimRole) setRole(claimRole);
@@ -44,6 +50,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!user) return;
+    if (user.email && DASHBOARD_ADMIN_EMAILS.has(user.email.toLowerCase())) {
+      setRole("admin");
+      return;
+    }
     const unsub = onSnapshot(doc(db, "user_roles", user.uid), (snapshot) => {
       if (snapshot.exists()) setRole(snapshot.data().role as UserRole);
     });
