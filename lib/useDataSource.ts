@@ -141,6 +141,8 @@ export type DashboardDistributions = {
   issuesBySeverity: DistributionItem[];
   issuesBySource: DistributionItem[];
   issuesByField: DistributionItem[];
+  transferByDirection: DistributionItem[];
+  transferReadiness: DistributionItem[];
 };
 
 function apiDistributions(payload: ApiPayload | null): DashboardDistributions | null {

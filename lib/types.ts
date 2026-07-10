@@ -10,6 +10,10 @@ export interface DashboardMetrics {
   pendingConfirmation: number;
   flightSupportRequired: number;
   hotelSupportRequired: number;
+  airportHotelPickupRequired?: number;
+  airportHotelPickupReady?: number;
+  hotelAirportPickupRequired?: number;
+  hotelAirportPickupReady?: number;
   pickupPending: number;
   openIssues: number;
   criticalIssues: number;

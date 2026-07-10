@@ -85,6 +85,10 @@ export function DashboardPage() {
         <MetricCard label="Pending confirmation" value={m?.pendingConfirmation ?? 0} />
         <MetricCard label="Flight support required" value={m?.flightSupportRequired ?? 0} />
         <MetricCard label="Hotel support required" value={m?.hotelSupportRequired ?? 0} />
+        <MetricCard label="Airport - Hotel required" value={m?.airportHotelPickupRequired ?? 0} />
+        <MetricCard label="Airport - Hotel ready" value={m?.airportHotelPickupReady ?? 0} />
+        <MetricCard label="Hotel - Airport required" value={m?.hotelAirportPickupRequired ?? 0} />
+        <MetricCard label="Hotel - Airport ready" value={m?.hotelAirportPickupReady ?? 0} />
         <MetricCard label="Pickup pending" value={m?.pickupPending ?? 0} />
         <MetricCard label="Open issues" value={m?.openIssues ?? issues.data.filter(i => i.status !== "Resolved").length} />
         <MetricCard label="Critical issues" value={m?.criticalIssues ?? issues.data.filter(i => i.severity === "Critical").length} />
@@ -96,6 +100,8 @@ export function DashboardPage() {
         <PieDistribution title="Participants by role" data={(distributions.data?.participantsByRole ?? countBy(people.data, (p) => p.role)).slice(0, 8)} />
         <BarDistribution title="Data issues by severity" data={(distributions.data?.issuesBySeverity ?? countBy(issues.data, (i) => i.severity)).slice(0, 8)} />
         <BarDistribution title="Issues by source" data={(distributions.data?.issuesBySource ?? countBy(issues.data, (i) => i.sourceKey)).slice(0, 8)} />
+        <BarDistribution title="Transfer requests by direction" data={(distributions.data?.transferByDirection ?? []).slice(0, 8)} />
+        <BarDistribution title="Transfer readiness" data={(distributions.data?.transferReadiness ?? []).slice(0, 8)} />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
