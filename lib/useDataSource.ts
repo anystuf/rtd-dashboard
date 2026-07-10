@@ -134,6 +134,21 @@ function apiMetrics(payload: ApiPayload | null) {
   return (record.current && typeof record.current === "object" ? record.current : record) as DashboardMetrics;
 }
 
+export type DistributionItem = { name: string; value: number };
+export type DashboardDistributions = {
+  participantsByCountry: DistributionItem[];
+  participantsByRole: DistributionItem[];
+  issuesBySeverity: DistributionItem[];
+  issuesBySource: DistributionItem[];
+  issuesByField: DistributionItem[];
+};
+
+function apiDistributions(payload: ApiPayload | null): DashboardDistributions | null {
+  const value = payload?.dashboard_distributions;
+  if (!value || Array.isArray(value) || typeof value !== "object") return null;
+  return value as DashboardDistributions;
+}
+
 export function useCollectionSource<T>(key: string, queryRef: Query) {
   const apiUrl = useDataApiUrl();
   const api = useApiPayload(apiUrl);
@@ -226,4 +241,16 @@ export function useDashboardMetricsSource(docRef: DocumentReference) {
       source: "firestore" as const
     };
   }, [api.data, api.error, api.loading, apiUrl, firestoreData, firestoreError, firestoreLoading]);
+}
+
+export function useDashboardDistributionsSource() {
+  const apiUrl = useDataApiUrl();
+  const api = useApiPayload(apiUrl);
+
+  return useMemo(() => ({
+    data: apiUrl ? apiDistributions(api.data) : null,
+    loading: apiUrl ? api.loading : false,
+    error: apiUrl ? api.error : null,
+    source: apiUrl ? "api" as const : "firestore" as const
+  }), [api.data, api.error, api.loading, apiUrl]);
 }

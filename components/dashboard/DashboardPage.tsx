@@ -4,7 +4,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { MetricCard } from "@/components/dashboard/MetricCard";
 import { BarDistribution, PieDistribution } from "@/components/dashboard/SimpleCharts";
 import { qDashboardMetrics, qIssues, qPeople, qSyncLogs } from "@/lib/queries";
-import { useCollectionSource, useDashboardMetricsSource } from "@/lib/useDataSource";
+import { useCollectionSource, useDashboardDistributionsSource, useDashboardMetricsSource } from "@/lib/useDataSource";
 import type { DataQualityIssue, Person } from "@/lib/types";
 import { formatDateTime } from "@/lib/utils";
 
@@ -30,9 +30,10 @@ function countBy<T>(rows: T[], getter: (row: T) => string | undefined) {
 
 function RiskPanel({ issues }: { issues: DataQualityIssue[] }) {
   const open = issues.filter((i) => i.status !== "Resolved");
-  const privacy = open.filter((i) => i.category === "Privacy/Security").length;
-  const high = open.filter((i) => i.severity === "Critical" || i.severity === "High").length;
-  const missing = open.filter((i) => /Completeness|missing|blank/i.test(`${i.category} ${i.issueDescription}`)).length;
+  const count = (issue: DataQualityIssue) => Number((issue as DataQualityIssue & { count?: number }).count || 1);
+  const privacy = open.filter((i) => i.category === "Privacy/Security").reduce((sum, issue) => sum + count(issue), 0);
+  const high = open.filter((i) => i.severity === "Critical" || i.severity === "High").reduce((sum, issue) => sum + count(issue), 0);
+  const missing = open.filter((i) => /Completeness|missing|blank/i.test(`${i.category} ${i.issueDescription}`)).reduce((sum, issue) => sum + count(issue), 0);
   const riskRows = [
     { label: "Privacy exposure", value: privacy, tone: privacy ? "border-red-200 bg-red-50 text-red-800" : "border-emerald-200 bg-emerald-50 text-emerald-800", how: "Sensitive-field validator found PII in a displayable/raw row." },
     { label: "High priority issues", value: high, tone: high ? "border-orange-200 bg-orange-50 text-orange-800" : "border-emerald-200 bg-emerald-50 text-emerald-800", how: "Severity is Critical or High in data_quality_issues." },
@@ -53,6 +54,7 @@ function RiskPanel({ issues }: { issues: DataQualityIssue[] }) {
 
 export function DashboardPage() {
   const metrics = useDashboardMetricsSource(qDashboardMetrics());
+  const distributions = useDashboardDistributionsSource();
   const people = useCollectionSource<Person>("people", qPeople());
   const issues = useCollectionSource<DataQualityIssue>("data_quality_issues", qIssues());
   const syncLogs = useCollectionSource<Record<string, unknown>>("sync_logs", qSyncLogs());
@@ -70,6 +72,10 @@ export function DashboardPage() {
 
       <RiskPanel issues={issues.data} />
 
+      <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+        Public dashboard mode: charts contain aggregate counts only. Names, emails, passport details, and individual travel records are not sent to this website.
+      </div>
+
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <MetricCard label="Total participants" value={m?.totalParticipants ?? people.data.length} />
         <MetricCard label="Total VIPs" value={m?.totalVIPs ?? 0} />
@@ -86,16 +92,16 @@ export function DashboardPage() {
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <BarDistribution title="Participants by country" data={countBy(people.data, (p) => p.country)} />
-        <PieDistribution title="Participants by role" data={countBy(people.data, (p) => p.role)} />
-        <BarDistribution title="Data issues by severity" data={countBy(issues.data, (i) => i.severity)} />
-        <BarDistribution title="Issues by source" data={countBy(issues.data, (i) => i.sourceKey)} />
+        <BarDistribution title="Participants by country" data={(distributions.data?.participantsByCountry ?? countBy(people.data, (p) => p.country)).slice(0, 8)} />
+        <PieDistribution title="Participants by role" data={(distributions.data?.participantsByRole ?? countBy(people.data, (p) => p.role)).slice(0, 8)} />
+        <BarDistribution title="Data issues by severity" data={(distributions.data?.issuesBySeverity ?? countBy(issues.data, (i) => i.severity)).slice(0, 8)} />
+        <BarDistribution title="Issues by source" data={(distributions.data?.issuesBySource ?? countBy(issues.data, (i) => i.sourceKey)).slice(0, 8)} />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <section className="rounded-lg border bg-white p-5">
           <h2 className="text-base font-semibold text-slate-900">Source links</h2>
-          <p className="mt-1 text-sm text-slate-500">Each warning keeps its sourceKey, sheet name, row, field, and evidence in Data Quality.</p>
+          <p className="mt-1 text-sm text-slate-500">Warnings are grouped by source and field. Row-level identities remain in the protected Google Sheets.</p>
           <div className="mt-4 grid gap-2 text-sm">
             {Object.entries(sourceLinks).map(([key, href]) => (
               <a key={key} href={href} target="_blank" className="flex items-center justify-between rounded-lg border px-3 py-2 text-blue-700 hover:bg-blue-50">

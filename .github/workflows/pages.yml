@@ -45,7 +45,7 @@ jobs:
           NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "965601362778"
           NEXT_PUBLIC_FIREBASE_APP_ID: "1:965601362778:web:a82c7c0a5368c63279e963"
           NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: "G-R1FJQW22EL"
-          NEXT_PUBLIC_DATA_API_URL: ""
+          NEXT_PUBLIC_DATA_API_URL: "https://script.google.com/macros/s/AKfycbx2N9tG20ONYnCbPwS6Xg6v757jTLGcLieQuxUrcsZVAZWwaLh-eJf4idFTcJXJuztL/exec"
 
       - name: Disable Jekyll
         shell: bash
