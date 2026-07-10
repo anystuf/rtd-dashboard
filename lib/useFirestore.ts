@@ -10,8 +10,10 @@ export function useCollection<T>(queryRef: Query) {
 
   useEffect(() => {
     setLoading(true);
+    setError(null);
     const unsub = onSnapshot(queryRef, (snapshot) => {
       setData(snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as T)));
+      setError(null);
       setLoading(false);
     }, (err) => {
       setError(err.message);
@@ -30,8 +32,10 @@ export function useDoc<T>(docRef: DocumentReference) {
 
   useEffect(() => {
     setLoading(true);
+    setError(null);
     const unsub = onSnapshot(docRef, (snapshot) => {
       setData(snapshot.exists() ? ({ id: snapshot.id, ...snapshot.data() } as T) : null);
+      setError(null);
       setLoading(false);
     }, (err) => {
       setError(err.message);

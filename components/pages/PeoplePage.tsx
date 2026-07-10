@@ -4,6 +4,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { RealtimeTable } from "@/components/tables/RealtimeTable";
 import { useCollection } from "@/lib/useFirestore";
 import { qPeople, qUEH, qVIP } from "@/lib/queries";
+import { sortByText } from "@/lib/utils";
 import type { Person } from "@/lib/types";
 
 const columns = [
@@ -20,6 +21,7 @@ const columns = [
 export function PeoplePage({ mode }: { mode: "all" | "vip" | "ueh" }) {
   const q = mode === "vip" ? qVIP() : mode === "ueh" ? qUEH() : qPeople();
   const { data, loading, error } = useCollection<Person>(q);
+  const rows = sortByText(data, "fullName");
   const title = mode === "vip" ? "VIP Data" : mode === "ueh" ? "UEH Data" : "Participants";
   const desc = mode === "vip" ? "Sanitized VIP participant list." : mode === "ueh" ? "UEH-related people extracted from all sources." : "All normalized people.";
 
@@ -29,8 +31,8 @@ export function PeoplePage({ mode }: { mode: "all" | "vip" | "ueh" }) {
         <h1 className="text-2xl font-bold text-slate-900">{title}</h1>
         <p className="text-sm text-slate-500">{desc}</p>
       </div>
-      {error ? <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div> : null}
-      <RealtimeTable rows={loading ? [] : data} columns={columns} />
+      {error ? <div className="mb-4 max-w-full overflow-hidden rounded-lg bg-red-50 p-3 text-sm text-red-700 break-words">{error}</div> : null}
+      <RealtimeTable rows={loading ? [] : rows} columns={columns} />
     </AppShell>
   );
 }

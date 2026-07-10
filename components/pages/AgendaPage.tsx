@@ -4,6 +4,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { RealtimeTable } from "@/components/tables/RealtimeTable";
 import { useCollection } from "@/lib/useFirestore";
 import { qAgenda } from "@/lib/queries";
+import { sortByFields } from "@/lib/utils";
 
 const columns = [
   { key: "date", label: "Date" },
@@ -18,13 +19,14 @@ const columns = [
 
 export function AgendaPage() {
   const { data } = useCollection<Record<string, unknown>>(qAgenda());
+  const rows = sortByFields(data, ["date", "startTime", "title"]);
   return (
     <AppShell>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900">Agenda</h1>
         <p className="text-sm text-slate-500">Realtime agenda/session view.</p>
       </div>
-      <RealtimeTable rows={data} columns={columns} />
+      <RealtimeTable rows={rows} columns={columns} />
     </AppShell>
   );
 }

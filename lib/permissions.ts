@@ -13,6 +13,13 @@ export function canAccess(path: string, role?: UserRole | null) {
   return true;
 }
 
+export function requiredRoleForPath(path: string) {
+  if (path.startsWith("/admin")) return "admin";
+  if (["/flights-pickup", "/hotel"].some((p) => path.startsWith(p))) return "logistics";
+  if (["/data-quality", "/sync-logs"].some((p) => path.startsWith(p))) return "program, logistics, or admin";
+  return "signed-in user";
+}
+
 export function labelForRole(role?: UserRole | null) {
   return role || "viewer";
 }

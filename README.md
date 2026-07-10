@@ -61,6 +61,14 @@ firebase use --add
 firebase deploy --only firestore:rules,firestore:indexes
 ```
 
+For Google sign-in on GitHub Pages, add this authorized domain in Firebase Console:
+
+```txt
+anystuf.github.io
+```
+
+Path: **Authentication** -> **Settings** -> **Authorized domains**.
+
 Set function environment variables/secrets in Firebase or Google Cloud Runtime environment:
 
 ```bash

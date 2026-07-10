@@ -9,6 +9,8 @@ Create a Firebase project and enable:
 - Cloud Functions
 - Hosting is not required for the frontend if you use GitHub Pages
 
+For GitHub Pages Google sign-in, add `anystuf.github.io` in Firebase Console under **Authentication** -> **Settings** -> **Authorized domains**.
+
 ## 2. Google Sheets API access
 
 ### Recommended: service account

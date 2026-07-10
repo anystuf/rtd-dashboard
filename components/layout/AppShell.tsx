@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { cn } from "@/lib/utils";
+import { canAccess } from "@/lib/permissions";
 import { BarChart3, CalendarDays, DatabaseZap, Hotel, Plane, ShieldAlert, Star, University, Users } from "lucide-react";
 
 const nav = [
@@ -22,6 +23,7 @@ const nav = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, role, logout } = useAuth();
+  const visibleNav = nav.filter((item) => canAccess(item.href, role));
 
   return (
     <RequireAuth>
@@ -32,7 +34,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="mt-1 text-lg font-bold text-slate-900">Live Operations</div>
           </div>
           <nav className="space-y-1 p-3">
-            {nav.map((item) => {
+            {visibleNav.map((item) => {
               const Icon = item.icon;
               const active = pathname === item.href || pathname.startsWith(item.href + "/");
               return (

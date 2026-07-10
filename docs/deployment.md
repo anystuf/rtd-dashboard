@@ -30,6 +30,18 @@ The workflow at `.github/workflows/pages.yml` builds the static site whenever `m
 
 Before the first deployment, open the GitHub repo settings and set Pages source to **GitHub Actions**.
 
+For Google sign-in on GitHub Pages, open Firebase Console:
+
+1. Go to **Authentication**.
+2. Open **Settings**.
+3. Under **Authorized domains**, add:
+
+```txt
+anystuf.github.io
+```
+
+Without this domain, Firebase rejects Google sign-in from `https://anystuf.github.io/rtd-dashboard/` with `auth/unauthorized-domain`.
+
 For GitHub Pages, the build sets:
 
 ```env
