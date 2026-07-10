@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+.env
+.env.local
+.env.*.local
+functions/lib
+functions/node_modules
+.firebase
+.emulator-data
+*.log
+service-account*.json
