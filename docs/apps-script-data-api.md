@@ -40,14 +40,32 @@ function doGet(e) {
 
 function buildPayload() {
   const raw = {};
+  const readErrors = [];
   SOURCES.forEach((source) => {
-    raw[source.key] = readSheet(source);
+    try {
+      raw[source.key] = readSheet(source);
+    } catch (error) {
+      raw[source.key] = [];
+      readErrors.push({
+        sourceKey: source.key,
+        message: error && error.message ? error.message : String(error)
+      });
+    }
   });
 
   const people = normalizePeople(raw.people || []);
   const participation = raw.participation || [];
   const agenda = normalizeAgenda(raw.agenda_items || []);
-  const issues = [];
+  const issues = readErrors.map((error, index) => ({
+    id: `source-access-${index + 1}`,
+    severity: "Critical",
+    category: "Source access",
+    sourceKey: error.sourceKey,
+    issueDescription: error.message,
+    recommendedFix: "Share this Google Sheet with the Apps Script owner account, or deploy the script from an account that can open it.",
+    status: "Open",
+    createdAt: new Date().toISOString()
+  }));
 
   return {
     generatedAt: new Date().toISOString(),
@@ -62,13 +80,14 @@ function buildPayload() {
     sync_logs: [{
       id: `apps-script-${Date.now()}`,
       sourceKey: "apps-script",
-      status: "success",
+      status: readErrors.length ? "error" : "success",
       rowsRead: people.length + participation.length + agenda.length,
       rowsInserted: 0,
       rowsUpdated: 0,
       issuesCreated: issues.length,
       startedAt: new Date().toISOString(),
-      finishedAt: new Date().toISOString()
+      finishedAt: new Date().toISOString(),
+      errorMessage: readErrors.map((error) => `${error.sourceKey}: ${error.message}`).join("; ")
     }]
   };
 }
