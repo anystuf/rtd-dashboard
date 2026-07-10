@@ -11,6 +11,8 @@ import { formatDateTime } from "@/lib/utils";
 const sourceLinks: Record<string, string> = {
   checklist_vip: "https://docs.google.com/spreadsheets/d/1vrpQ-KKuT2Qf01C8lXJLkVExHUgz7R9t__D3DNMHgu4/edit#gid=167014734",
   checklist_hotel: "https://docs.google.com/spreadsheets/d/1vrpQ-KKuT2Qf01C8lXJLkVExHUgz7R9t__D3DNMHgu4/edit#gid=1985155730",
+  checklist_airport_hotel: "https://docs.google.com/spreadsheets/d/1vrpQ-KKuT2Qf01C8lXJLkVExHUgz7R9t__D3DNMHgu4/edit#gid=1993431451",
+  checklist_hotel_airport: "https://docs.google.com/spreadsheets/d/1vrpQ-KKuT2Qf01C8lXJLkVExHUgz7R9t__D3DNMHgu4/edit#gid=1918433301",
   form_confirmation: "https://docs.google.com/spreadsheets/d/1KRN68GZpi-jVMtbDOq3_JBhxGBW9iJin-Q-Q0hCj-oI/edit#gid=965101690",
   form_responses: "https://docs.google.com/spreadsheets/d/1KRN68GZpi-jVMtbDOq3_JBhxGBW9iJin-Q-Q0hCj-oI/edit#gid=779978401",
   master_agenda: "https://docs.google.com/spreadsheets/d/1WrtspXZmBELnlwppFB6VImkjvGjGu4QaUCL0IY40Wvo/edit#gid=876983529",
