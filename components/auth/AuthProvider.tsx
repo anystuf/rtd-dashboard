@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<AuthContextValue>(() => ({
     user,
-    role: role || (user ? "viewer" : null),
+    role: role || (user ? "guest" : null),
     loading,
     authError,
     login: async () => {

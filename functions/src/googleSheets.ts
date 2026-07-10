@@ -1,4 +1,4 @@
-import { google } from "googleapis";
+﻿import { google } from "googleapis";
 import crypto from "crypto";
 import type { SourceSheetConfig } from "./sourceSheets.js";
 import { validateHeaders } from "./validators.js";
@@ -48,6 +48,10 @@ export async function resolveSheetName(source: SourceSheetConfig) {
   const auth = getAuth();
   const sheets = google.sheets({ version: "v4", auth });
   const metadata = await sheets.spreadsheets.get({ spreadsheetId: source.spreadsheetId });
+  if (!source.gid) {
+    const firstTitle = metadata.data.sheets?.[0]?.properties?.title;
+    if (firstTitle) return firstTitle;
+  }
   const target = metadata.data.sheets?.find((s) => String(s.properties?.sheetId) === String(source.gid));
   if (!target?.properties?.title) {
     const available = metadata.data.sheets?.map((s) => `${s.properties?.title} (${s.properties?.sheetId})`).join(", ");
@@ -102,3 +106,5 @@ export async function readSheet(source: SourceSheetConfig): Promise<ReadSheetRes
     headerIssues: validateHeaders(source.sourceKey, sheetName, headers)
   };
 }
+
+

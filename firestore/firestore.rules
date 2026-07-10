@@ -25,18 +25,28 @@ service cloud.firestore {
       return signedIn() && (role() == 'admin' || role() == 'program' || role() == 'logistics');
     }
 
+    function accessDocId(personId) {
+      return request.auth.uid + "_" + personId;
+    }
+
+    function hasGuestAccess(personId) {
+      return signedIn()
+        && personId is string
+        && exists(/databases/$(database)/documents/person_access/$(accessDocId(personId)));
+    }
+
     match /dashboard_metrics/{docId} {
-      allow read: if signedIn();
+      allow read: if isOps();
       allow write: if false;
     }
 
     match /people/{docId} {
-      allow read: if signedIn();
+      allow read: if isOps() || hasGuestAccess(docId);
       allow write: if false;
     }
 
     match /participation/{docId} {
-      allow read: if signedIn();
+      allow read: if isOps() || hasGuestAccess(resource.data.personId);
       allow write: if false;
     }
 
@@ -46,17 +56,17 @@ service cloud.firestore {
     }
 
     match /hotel_bookings/{docId} {
-      allow read: if isLogistics();
+      allow read: if isLogistics() || hasGuestAccess(resource.data.personId);
       allow write: if false;
     }
 
     match /flight_segments/{docId} {
-      allow read: if isLogistics();
+      allow read: if isLogistics() || hasGuestAccess(resource.data.personId);
       allow write: if false;
     }
 
     match /pickup_tasks/{docId} {
-      allow read: if isLogistics();
+      allow read: if isLogistics() || hasGuestAccess(resource.data.personId);
       allow write: if false;
     }
 
@@ -72,13 +82,18 @@ service cloud.firestore {
     }
 
     match /person_sensitive/{docId} {
-      allow read: if isAdmin();
+      allow read: if isAdmin() || hasGuestAccess(docId);
       allow write: if false;
     }
 
     match /raw_sheet_snapshots/{docId} {
       allow read: if isAdmin();
       allow write: if false;
+    }
+
+    match /person_access/{docId} {
+      allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow write: if isAdmin();
     }
 
     match /user_roles/{uid} {
