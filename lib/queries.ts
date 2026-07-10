@@ -12,3 +12,8 @@ export const qPickup = () => query(collection(db, "pickup_tasks"), orderBy("full
 export const qAgenda = () => query(collection(db, "agenda_items"), limit(1000));
 export const qIssues = () => query(collection(db, "data_quality_issues"), orderBy("createdAt", "desc"), limit(1000));
 export const qSyncLogs = () => query(collection(db, "sync_logs"), orderBy("startedAt", "desc"), limit(100));
+export const qGuestAccess = (uid: string) => query(collection(db, "person_access"), where("uid", "==", uid), limit(20));
+export const qParticipationForPerson = (personId: string) => query(collection(db, "participation"), where("personId", "==", personId), limit(50));
+export const qHotelForPerson = (personId: string) => query(collection(db, "hotel_bookings"), where("personId", "==", personId), limit(50));
+export const qFlightsForPerson = (personId: string) => query(collection(db, "flight_segments"), where("personId", "==", personId), limit(50));
+export const qPickupForPerson = (personId: string) => query(collection(db, "pickup_tasks"), where("personId", "==", personId), limit(50));

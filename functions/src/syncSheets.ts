@@ -1,4 +1,4 @@
-import { getFirestore, FieldValue } from "firebase-admin/firestore";
+﻿import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { SOURCE_SHEETS, SourceSheetConfig } from "./sourceSheets.js";
 import { readSheet } from "./googleSheets.js";
 import { buildPersonCore, detectUEH, firstField, normalizeAttendanceStatus, normalizeBoolean, normalizeDate, normalizeFlightNo, normalizeSupportStatus, stableId } from "./normalize.js";
@@ -121,7 +121,7 @@ async function normalizeSourceRows(result: ReadSheetResult) {
         nationality: core.nationality,
         role: core.role,
         isUEH: detectUEH(rawJson),
-        isVIP: result.sourceKey === "vip_hotel" || /vip/i.test(JSON.stringify(rawJson)),
+        isVIP: ["vip_hotel", "checklist_vip"].includes(result.sourceKey) || /vip/i.test(JSON.stringify(rawJson)),
         sourceKeys: FieldValue.arrayUnion(result.sourceKey),
         updatedAt: now(),
         createdAt: FieldValue.serverTimestamp()
@@ -134,26 +134,26 @@ async function normalizeSourceRows(result: ReadSheetResult) {
         dateOfBirth: firstField(sensitive, [/date\s*of\s*birth/i, /day\s*of\s*birth/i, /dob/i]),
         passportNo: firstField(sensitive, [/passport\s*no/i, /passport/i]),
         passportName: firstField(sensitive, [/full\s*name.*passport/i, /passport\s*name/i]),
-        passportImageUrl: firstField(sensitive, [/hình\s*passport/i, /passport\s*image/i]),
-        phone: firstField(sensitive, [/phone/i, /mobile/i, /sđt/i]),
+        passportImageUrl: firstField(sensitive, [/hÃ¬nh\s*passport/i, /passport\s*image/i]),
+        phone: firstField(sensitive, [/phone/i, /mobile/i, /sÄ‘t/i]),
         rawSensitiveJson: sensitive,
         updatedAt: now(),
         createdAt: FieldValue.serverTimestamp()
       }, { merge: true });
     }
 
-    if (result.sourceKey.includes("agenda")) {
+    if (result.sourceKey === "master_agenda") {
       const agendaId = docIdFromParts(result.sourceKey, result.sheetName, String(row.rowIndex));
       writer.set(db.collection("agenda_items").doc(agendaId), {
         sourceRow: row.rowIndex,
-        date: firstField(sanitized, [/date/i, /ngày/i]),
-        startTime: firstField(sanitized, [/start/i, /begin/i, /bắt\s*đầu/i, /time/i]),
-        endTime: firstField(sanitized, [/end/i, /kết\s*thúc/i]),
-        session: firstField(sanitized, [/session/i, /phiên/i]),
-        title: firstField(sanitized, [/title/i, /topic/i, /nội\s*dung/i]),
-        speaker: firstField(sanitized, [/speaker/i, /presenter/i, /diễn\s*giả/i]),
-        room: firstField(sanitized, [/room/i, /venue/i, /location/i, /phòng/i]),
-        notes: firstField(sanitized, [/note/i, /ghi\s*chú/i]),
+        date: firstField(sanitized, [/date/i, /ngÃ y/i]),
+        startTime: firstField(sanitized, [/start/i, /begin/i, /báº¯t\s*Ä‘áº§u/i, /time/i]),
+        endTime: firstField(sanitized, [/end/i, /káº¿t\s*thÃºc/i]),
+        session: firstField(sanitized, [/session/i, /phiÃªn/i]),
+        title: firstField(sanitized, [/title/i, /topic/i, /ná»™i\s*dung/i]),
+        speaker: firstField(sanitized, [/speaker/i, /presenter/i, /diá»…n\s*giáº£/i]),
+        room: firstField(sanitized, [/room/i, /venue/i, /location/i, /phÃ²ng/i]),
+        notes: firstField(sanitized, [/note/i, /ghi\s*chÃº/i]),
         updatedAt: now(),
         createdAt: FieldValue.serverTimestamp()
       }, { merge: true });
@@ -167,7 +167,7 @@ async function normalizeSourceRows(result: ReadSheetResult) {
         conferenceRole: firstField(sanitized, [/conference\s*role/i, /^role$/i]),
         typeOfAttendance: firstField(sanitized, [/type\s*of\s*attendance/i, /attendance\s*type/i]),
         attendConference: normalizeAttendanceStatus(firstField(sanitized, [/attend\s*the\s*conference/i, /attend/i])),
-        attendanceConfirmStatus: normalizeAttendanceStatus(firstField(sanitized, [/tình\s*trạng\s*confirm/i, /confirm/i, /status/i])),
+        attendanceConfirmStatus: normalizeAttendanceStatus(firstField(sanitized, [/tÃ¬nh\s*tráº¡ng\s*confirm/i, /confirm/i, /status/i])),
         formConfirmStatus: normalizeAttendanceStatus(firstField(sanitized, [/confirm.*form/i, /form.*confirm/i])),
         rtdSupportFlight: normalizeSupportStatus(firstField(sanitized, [/support\s*flight/i, /flight\s*ticket/i])),
         rtdSupportHotel: normalizeSupportStatus(firstField(sanitized, [/support\s*hotel/i, /hotel/i])),
@@ -186,7 +186,7 @@ async function normalizeSourceRows(result: ReadSheetResult) {
           checkOut: normalizeDate(firstField(sanitized, [/check\s*out/i, /departure\s*date/i])),
           roomType: firstField(sanitized, [/room\s*type/i, /room/i]),
           supportStatus: normalizeSupportStatus(firstField(sanitized, [/support\s*hotel/i, /hotel\s*support/i])),
-          notes: firstField(sanitized, [/note/i, /ghi\s*chú/i]),
+          notes: firstField(sanitized, [/note/i, /ghi\s*chÃº/i]),
           updatedAt: now(),
           createdAt: FieldValue.serverTimestamp()
         }, { merge: true });
@@ -197,8 +197,8 @@ async function normalizeSourceRows(result: ReadSheetResult) {
       if (arrivalFlight) writeFlight(writer, personId, core.fullName, "arrival", arrivalFlight, sanitized, result, row.rowIndex);
       if (departureFlight) writeFlight(writer, personId, core.fullName, "departure", departureFlight, sanitized, result, row.rowIndex);
 
-      const pickupRequired = normalizeBoolean(firstField(sanitized, [/pickup/i, /đưa\s*đón/i, /dua\s*don/i]));
-      if (pickupRequired || /pickup|đưa đón|dua don/i.test(JSON.stringify(sanitized))) {
+      const pickupRequired = normalizeBoolean(firstField(sanitized, [/pickup/i, /Ä‘Æ°a\s*Ä‘Ã³n/i, /dua\s*don/i]));
+      if (pickupRequired || /pickup|Ä‘Æ°a Ä‘Ã³n|dua don/i.test(JSON.stringify(sanitized))) {
         const pickupId = docIdFromParts(personId, result.sourceKey, String(row.rowIndex), "pickup");
         writer.set(db.collection("pickup_tasks").doc(pickupId), {
           personId,
@@ -207,11 +207,11 @@ async function normalizeSourceRows(result: ReadSheetResult) {
           pickupDatetime: normalizeDate(firstField(sanitized, [/pickup.*time/i, /arrival.*time/i])),
           pickupLocation: firstField(sanitized, [/pickup\s*location/i, /airport/i]),
           dropoffLocation: firstField(sanitized, [/dropoff/i, /hotel/i]),
-          driver: firstField(sanitized, [/driver/i, /tài\s*xế/i]),
+          driver: firstField(sanitized, [/driver/i, /tÃ i\s*xáº¿/i]),
           vehicle: firstField(sanitized, [/vehicle/i, /car/i, /xe/i]),
           pickupStatus: firstField(sanitized, [/pickup\s*status/i, /status/i]),
           sharedPickupGroupId: "",
-          notes: firstField(sanitized, [/note/i, /ghi\s*chú/i]),
+          notes: firstField(sanitized, [/note/i, /ghi\s*chÃº/i]),
           updatedAt: now(),
           createdAt: FieldValue.serverTimestamp()
         }, { merge: true });
@@ -237,7 +237,7 @@ function writeFlight(writer: FirebaseFirestore.BulkWriter, personId: string, ful
     airport: firstField(row, [new RegExp(`${direction}.*airport`, "i"), /airport/i]),
     flightDatetime: normalizeDate(firstField(row, [new RegExp(`${direction}.*time`, "i"), /flight.*time/i, /arrival/i, /departure/i])),
     airline: firstField(row, [/airline/i]),
-    notes: firstField(row, [/note/i, /ghi\s*chú/i]),
+    notes: firstField(row, [/note/i, /ghi\s*chÃº/i]),
     updatedAt: now(),
     createdAt: FieldValue.serverTimestamp()
   }, { merge: true });
@@ -260,7 +260,7 @@ async function updateMetrics() {
     totalParticipants: people.length,
     totalVIPs: people.filter((p) => p.isVIP).length,
     totalUEH: people.filter((p) => p.isUEH).length,
-    internationalGuests: people.filter((p) => p.country && !/vietnam|việt nam/i.test(String(p.country))).length,
+    internationalGuests: people.filter((p) => p.country && !/vietnam|viá»‡t nam/i.test(String(p.country))).length,
     confirmedAttendance: confirmed,
     pendingConfirmation: pending,
     flightSupportRequired: flightsSnap.size,
@@ -280,3 +280,4 @@ export async function syncAll(sourceKey?: string) {
   await updateMetrics();
   return { ok: true, results };
 }
+

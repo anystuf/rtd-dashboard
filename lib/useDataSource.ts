@@ -6,7 +6,7 @@ import type { DashboardMetrics } from "./types";
 
 type ApiPayload = Record<string, unknown>;
 
-const POLL_MS = 60_000;
+const POLL_MS = 120_000;
 const BUILD_DATA_API_URL = process.env.NEXT_PUBLIC_DATA_API_URL || "";
 
 function readBrowserDataApiUrl() {
