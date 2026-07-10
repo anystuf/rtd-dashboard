@@ -23,7 +23,7 @@ export function normalizeCountry(value: unknown) {
   const text = String(value ?? "").trim();
   const lower = text.toLowerCase();
   const map: Record<string, string> = {
-    viet nam: "Vietnam",
+    "viet nam": "Vietnam",
     vietnam: "Vietnam",
     "việt nam": "Vietnam",
     korea: "South Korea",

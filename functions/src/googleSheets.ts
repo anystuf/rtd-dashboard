@@ -22,7 +22,9 @@ function getAuth() {
     return oauth2Client;
   }
 
-  throw new Error("Missing Google auth. Set GOOGLE_SERVICE_ACCOUNT_JSON or OAuth client + refresh token env vars.");
+  return new google.auth.GoogleAuth({
+    scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+  });
 }
 
 export interface RawSheetRow {
